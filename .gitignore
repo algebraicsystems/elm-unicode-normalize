@@ -3,5 +3,8 @@
 /CompositionExclusions.txt
 /NormalizationTest.txt
 
+# Generated code
+/src/Unicode/Normalize/Internal.elm
+
 # Elm
 /elm-stuff/
