@@ -149,7 +149,7 @@ canonicalComposeHelper starter blockers codes =
                     if currentClass == 0 then
                         starter
                             :: List.reverse blockers
-                            ++ canonicalComposeHelper code [] codes
+                            ++ canonicalComposeHelper code [] rest
 
                     else
                         canonicalComposeHelper starter (code :: blockers) rest
