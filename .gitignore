@@ -1,3 +1,7 @@
+# UCD
 /UnicodeData.txt
 /CompositionExclusions.txt
 /NormalizationTest.txt
+
+# Elm
+/elm-stuff/
