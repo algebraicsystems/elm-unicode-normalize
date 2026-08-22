@@ -152,4 +152,4 @@ canonicalComposeHelper starter blockers codes =
                             ++ canonicalComposeHelper code [] codes
 
                     else
-                        canonicalComposeHelper starter (code :: blockers) codes
+                        canonicalComposeHelper starter (code :: blockers) rest
