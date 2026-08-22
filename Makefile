@@ -5,6 +5,10 @@ BASE_URL := https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 .PHONY: all
 all: src/Unicode/Normalize/Internal.elm
 
+.PHONY: test
+test: tests/TestNormalize.elm
+	pnpm run test
+
 
 UnicodeData.txt:
 	curl -fsSL -o $@ $(BASE_URL)/$@
@@ -19,9 +23,15 @@ NormalizationTest.txt:
 src/Unicode/Normalize:
 	mkdir src/Unicode/Normalize
 
+tests:
+	mkdir tests
+
 .venv:
 	poetry install
 
 
 src/Unicode/Normalize/Internal.elm: generate.py UnicodeData.txt CompositionExclusions.txt | src/Unicode/Normalize .venv
 	poetry run python generate.py
+
+tests/TestNormalize.elm: generate-tests.py NormalizationTest.txt | tests .venv
+	poetry run python generate-tests.py

@@ -40,10 +40,11 @@ normalize =
 
 {-| The different ways to normalize a string.
 
-- **NFC**: Canonical decomposition followed by canonical composition.
-- **NFD**: Canonical decomposition without recomposition.
-- **NFKC**: Compatibility decomposition followed by canonical composition.
-- **NFKD**: Compatibility decomposition without recomposition.
+  - **NFC**: Canonical decomposition followed by canonical composition.
+  - **NFD**: Canonical decomposition without recomposition.
+  - **NFKC**: Compatibility decomposition followed by canonical composition.
+  - **NFKD**: Compatibility decomposition without recomposition.
+
 -}
 type Form
     = NFC

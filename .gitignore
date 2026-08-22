@@ -5,6 +5,10 @@
 
 # Generated code
 /src/Unicode/Normalize/Internal.elm
+/tests/TestNormalize.elm
+
+# Node
+/node_modules/
 
 # Elm
 /elm-stuff/
