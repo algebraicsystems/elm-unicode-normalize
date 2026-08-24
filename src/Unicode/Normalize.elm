@@ -15,6 +15,9 @@ string. If you don't care about the details, just use `normalize NFC`.
     normalize NFC "é"
     --> "é"
 
+    normalize NFC (String.fromList [ 'ᄉ', 'ᅥ', 'ᆼ' ])
+    --> "성"
+
 
 # Normalization Forms
 
@@ -70,12 +73,12 @@ For example, the character "ñ" can be represented as a single code point
 The compatibility forms also replace visual variants:
 
     -- NFKC replaces ﬁ ligature with "fi" and composes
-    normalize NFKC "ﬁ"
-    --> "fi"
+    normalize NFKC "ﬁñ"
+    --> "fiñ"
 
     -- NFKD replaces ﬁ ligature with "fi" and decomposes
-    normalize NFKD "ﬁ"
-    --> "fi"
+    normalize NFKD "ﬁñ"
+    --> "fiñ"
 
 -}
 type Form
@@ -97,7 +100,7 @@ type Form
 
     -- Compatibility normalization replaces special forms
     normalize NFKC "①②③"
-    --> "①②③"
+    --> "123"
 
     normalize NFKC "ﬃ"
     --> "ffi"
