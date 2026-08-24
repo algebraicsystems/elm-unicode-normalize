@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"format": "elm-format --yes src/Unicode/Normalize.elm",
-		"review": "elm-review",
+		"review": "elm-review src/Unicode/Normalize.elm",
 		"test": "elm-test"
 	},
 	"devDependencies": {
