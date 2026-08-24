@@ -1,6 +1,7 @@
 module Unicode.Normalize exposing
     ( normalize
     , Form(..), normalizeForm
+    , composeHangulSyllable1, composeHangulSyllable2
     )
 
 {-| Get a Unicode Normalization Form of a string.
@@ -273,23 +274,23 @@ decomposeHangulSyllable code =
     in
     if index >= 0 && index < syllableCount then
         let
-            leading : Int
-            leading =
+            leadingIndex : Int
+            leadingIndex =
                 leadingBase + (index // vowelTrailingCount)
 
-            vowel : Int
-            vowel =
+            vowelIndex : Int
+            vowelIndex =
                 vowelBase + (modBy vowelTrailingCount index // trailingCount)
 
-            trailing : Int
-            trailing =
+            trailingIndex : Int
+            trailingIndex =
                 modBy trailingCount index
         in
-        if trailing == 0 then
-            Just [ leading, vowel ]
+        if trailingIndex == 0 then
+            Just [ leadingIndex, vowelIndex ]
 
         else
-            Just [ leading, vowel, trailing ]
+            Just [ leadingIndex, vowelIndex, trailingBase + trailingIndex ]
 
     else
         Nothing
@@ -328,11 +329,14 @@ composeHangulSyllable2 syllable trailing =
         trailingIndex : Int
         trailingIndex =
             trailing - trailingBase
+
+        _ =
+            Debug.log "indices" ( syllableIndex, trailingIndex )
     in
     if
         (syllableIndex >= 0)
             && (syllableIndex < syllableCount)
-            && (modBy syllableIndex trailingCount == 0)
+            && (modBy trailingCount syllableIndex == 0)
             && (trailingIndex >= 0)
             && (trailingIndex < trailingCount)
     then
