@@ -100,21 +100,21 @@ module Unicode.Normalize.Internal exposing
     , canonicalComposition
     )
 
-canonicalDecomposition : Int -> List Int
+canonicalDecomposition : Int -> Maybe (List Int)
 canonicalDecomposition code =
     case code of
 {%- for code in canonical_mappings %}
-        {{ code }} -> [ {{ canonical_mappings[code] | join(', ') }} ]
+        {{ code }} -> Just [ {{ canonical_mappings[code] | join(', ') }} ]
 {%- endfor %}
-        _ -> [ code ]
+        _ -> Nothing
 
-compatibleDecomposition : Int -> List Int
+compatibleDecomposition : Int -> Maybe (List Int)
 compatibleDecomposition code =
     case code of
 {%- for code in compatible_mappings %}
-        {{ code }} -> [ {{ compatible_mappings[code] | join(', ') }} ]
+        {{ code }} -> Just [ {{ compatible_mappings[code] | join(', ') }} ]
 {%- endfor %}
-        _ -> [ code ]
+        _ -> Nothing
 
 combiningClass : Int -> Int
 combiningClass code =

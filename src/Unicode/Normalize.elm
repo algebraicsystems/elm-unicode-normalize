@@ -63,16 +63,20 @@ normalizeForm : Form -> String -> String
 normalizeForm form =
     case form of
         NFC ->
-            withCodePoints (canonicalDecompose >> canonicalOrder >> canonicalCompose)
+            withCodePoints
+                (canonicalDecompose >> canonicalOrder >> canonicalCompose)
 
         NFD ->
-            withCodePoints (canonicalDecompose >> canonicalOrder)
+            withCodePoints
+                (canonicalDecompose >> canonicalOrder)
 
         NFKC ->
-            withCodePoints (compatibleDecompose >> canonicalOrder >> canonicalCompose)
+            withCodePoints
+                (compatibleDecompose >> canonicalOrder >> canonicalCompose)
 
         NFKD ->
-            withCodePoints (compatibleDecompose >> canonicalOrder)
+            withCodePoints
+                (compatibleDecompose >> canonicalOrder)
 
 
 withCodePoints : (List Int -> List Int) -> String -> String
@@ -98,11 +102,10 @@ canonicalDecompose : List Int -> List Int
 canonicalDecompose =
     let
         decompose code =
-            if isHangulSyllable code then
-                decomposeHangulSyllable code
-
-            else
-                canonicalDecomposition code
+            Nothing
+                |> tryMaybe (\() -> decomposeHangulSyllable code)
+                |> tryMaybe (\() -> canonicalDecomposition code)
+                |> Maybe.withDefault [ code ]
     in
     List.concatMap decompose
 
@@ -111,11 +114,10 @@ compatibleDecompose : List Int -> List Int
 compatibleDecompose =
     let
         decompose code =
-            if isHangulSyllable code then
-                decomposeHangulSyllable code
-
-            else
-                compatibleDecomposition code
+            Nothing
+                |> tryMaybe (\() -> decomposeHangulSyllable code)
+                |> tryMaybe (\() -> compatibleDecomposition code)
+                |> Maybe.withDefault [ code ]
     in
     List.concatMap decompose
 
@@ -190,8 +192,8 @@ canonicalComposeWithBlockers starter blockers codes =
 canonicalOrHangulComposition : Int -> Int -> Maybe Int
 canonicalOrHangulComposition =
     tryCompositions
-        [ composeLeadingJamoWithVowelJamo
-        , composeHangulSyllableWithTrailingJamo
+        [ composeHangulSyllable1
+        , composeHangulSyllable2
         , canonicalComposition
         ]
 
@@ -215,136 +217,138 @@ tryCompositions compositions starter code =
 -- HANGUL
 
 
-hangulSBase : Int
-hangulSBase =
+syllableBase : Int
+syllableBase =
     0xAC00
 
 
-hangulLBase : Int
-hangulLBase =
+leadingBase : Int
+leadingBase =
     0x1100
 
 
-hangulVBase : Int
-hangulVBase =
+vowelBase : Int
+vowelBase =
     0x1161
 
 
-hangulTBase : Int
-hangulTBase =
+trailingBase : Int
+trailingBase =
     0x11A7
 
 
-hangulLCount : Int
-hangulLCount =
+leadingCount : Int
+leadingCount =
     19
 
 
-hangulVCount : Int
-hangulVCount =
+vowelCount : Int
+vowelCount =
     21
 
 
-hangulTCount : Int
-hangulTCount =
+trailingCount : Int
+trailingCount =
     28
 
 
-hangulNCount : Int
-hangulNCount =
-    hangulVCount * hangulTCount
+vowelTrailingCount : Int
+vowelTrailingCount =
+    vowelCount * trailingCount
 
 
-hangulSCount : Int
-hangulSCount =
-    hangulLCount * hangulNCount
+syllableCount : Int
+syllableCount =
+    leadingCount * vowelTrailingCount
 
 
-isHangulSyllable : Int -> Bool
-isHangulSyllable code =
-    let
-        index =
-            code - hangulSBase
-    in
-    index >= 0 && index < hangulSCount
-
-
-isLeadingJamo : Int -> Bool
-isLeadingJamo code =
-    let
-        index =
-            code - hangulLBase
-    in
-    index >= 0 && index < hangulLCount
-
-
-isVowelJamo : Int -> Bool
-isVowelJamo code =
-    let
-        index =
-            code - hangulVBase
-    in
-    index >= 0 && index < hangulVCount
-
-
-isTrailingJamo : Int -> Bool
-isTrailingJamo code =
-    let
-        index =
-            code - hangulTBase
-    in
-    index >= 0 && index < hangulTCount
-
-
-decomposeHangulSyllable : Int -> List Int
+decomposeHangulSyllable : Int -> Maybe (List Int)
 decomposeHangulSyllable code =
     let
+        index : Int
         index =
-            code - hangulSBase
-
-        leading =
-            hangulLBase + (index // hangulNCount)
-
-        vowel =
-            hangulVBase + (modBy hangulNCount index // hangulTCount)
-
-        trailing =
-            modBy hangulTCount index
+            code - syllableBase
     in
-    if trailing == 0 then
-        [ leading, vowel ]
+    if index >= 0 && index < syllableCount then
+        let
+            leading : Int
+            leading =
+                leadingBase + (index // vowelTrailingCount)
 
-    else
-        [ leading, vowel, trailing ]
+            vowel : Int
+            vowel =
+                vowelBase + (modBy vowelTrailingCount index // trailingCount)
 
+            trailing : Int
+            trailing =
+                modBy trailingCount index
+        in
+        if trailing == 0 then
+            Just [ leading, vowel ]
 
-composeLeadingJamoWithVowelJamo : Int -> Int -> Maybe Int
-composeLeadingJamoWithVowelJamo leading vowel =
-    let
-        leadingIndex =
-            leading - hangulLBase
-
-        vowelIndex =
-            vowel - hangulVBase
-    in
-    if leadingIndex >= 0 && leadingIndex < hangulLCount && vowelIndex >= 0 && vowelIndex < hangulVCount then
-        Just (hangulSBase + ((leadingIndex * hangulVCount) + vowelIndex) * hangulTCount)
+        else
+            Just [ leading, vowel, trailing ]
 
     else
         Nothing
 
 
-composeHangulSyllableWithTrailingJamo : Int -> Int -> Maybe Int
-composeHangulSyllableWithTrailingJamo syllable trailing =
+composeHangulSyllable1 : Int -> Int -> Maybe Int
+composeHangulSyllable1 leading vowel =
     let
-        syllableIndex =
-            syllable - hangulSBase
+        leadingIndex : Int
+        leadingIndex =
+            leading - leadingBase
 
-        trailingIndex =
-            trailing - hangulTBase
+        vowelIndex : Int
+        vowelIndex =
+            vowel - vowelBase
     in
-    if syllableIndex >= 0 && syllableIndex < hangulSCount && modBy syllableIndex hangulTCount == 0 && trailingIndex >= 0 && trailingIndex < hangulTCount then
+    if
+        (leadingIndex >= 0)
+            && (leadingIndex < leadingCount)
+            && (vowelIndex >= 0)
+            && (vowelIndex < vowelCount)
+    then
+        Just (syllableBase + ((leadingIndex * vowelCount) + vowelIndex) * trailingCount)
+
+    else
+        Nothing
+
+
+composeHangulSyllable2 : Int -> Int -> Maybe Int
+composeHangulSyllable2 syllable trailing =
+    let
+        syllableIndex : Int
+        syllableIndex =
+            syllable - syllableBase
+
+        trailingIndex : Int
+        trailingIndex =
+            trailing - trailingBase
+    in
+    if
+        (syllableIndex >= 0)
+            && (syllableIndex < syllableCount)
+            && (modBy syllableIndex trailingCount == 0)
+            && (trailingIndex >= 0)
+            && (trailingIndex < trailingCount)
+    then
         Just (syllable + trailingIndex)
 
     else
         Nothing
+
+
+
+-- HELPERS
+
+
+tryMaybe : (() -> Maybe a) -> Maybe a -> Maybe a
+tryMaybe closure maybe =
+    case maybe of
+        Just value ->
+            Just value
+
+        Nothing ->
+            closure ()

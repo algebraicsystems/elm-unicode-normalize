@@ -1,9 +1,12 @@
 {
 	"scripts": {
+		"format": "elm-format --yes src/Unicode/Normalize.elm",
+		"review": "elm-review",
 		"test": "elm-test"
 	},
-	"dependencies": {
+	"devDependencies": {
 		"elm": "0.19.2-0",
+		"elm-review": "^2.13.5",
 		"elm-test": "0.19.2-0"
 	}
 }
