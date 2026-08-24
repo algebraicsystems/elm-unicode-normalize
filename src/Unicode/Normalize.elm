@@ -31,6 +31,10 @@ import Unicode.Normalize.Internal
         )
 
 
+
+-- PUBLIC API
+
+
 {-| Get the NFC normalization of a string.
 -}
 normalize : String -> String
@@ -86,14 +90,38 @@ fromCodePoints codes =
     String.fromList (List.map Char.fromCode codes)
 
 
+
+-- DECOMPOSITION
+
+
 canonicalDecompose : List Int -> List Int
 canonicalDecompose =
-    List.concatMap canonicalDecomposition
+    let
+        decompose code =
+            if isHangulSyllable code then
+                decomposeHangulSyllable code
+
+            else
+                canonicalDecomposition code
+    in
+    List.concatMap decompose
 
 
 compatibleDecompose : List Int -> List Int
 compatibleDecompose =
-    List.concatMap compatibleDecomposition
+    let
+        decompose code =
+            if isHangulSyllable code then
+                decomposeHangulSyllable code
+
+            else
+                compatibleDecomposition code
+    in
+    List.concatMap decompose
+
+
+
+-- ORDERING
 
 
 canonicalOrder : List Int -> List Int
@@ -111,6 +139,10 @@ canonicalOrder chars =
             List.foldr step ( [], [] ) chars
     in
     List.sortBy combiningClass finalRun ++ finalResult
+
+
+
+-- RECOMPOSITION
 
 
 canonicalCompose : List Int -> List Int
@@ -153,3 +185,83 @@ canonicalComposeWithBlockers starter blockers codes =
 
                     else
                         canonicalComposeWithBlockers starter (code :: blockers) rest
+
+
+
+-- HANGUL
+
+
+hangulSBase : Int
+hangulSBase =
+    0xAC00
+
+
+hangulLBase : Int
+hangulLBase =
+    0x1100
+
+
+hangulVBase : Int
+hangulVBase =
+    0x1161
+
+
+hangulTBase : Int
+hangulTBase =
+    0x11A7
+
+
+hangulLCount : Int
+hangulLCount =
+    19
+
+
+hangulVCount : Int
+hangulVCount =
+    21
+
+
+hangulTCount : Int
+hangulTCount =
+    28
+
+
+hangulNCount : Int
+hangulNCount =
+    hangulVCount * hangulTCount
+
+
+hangulSCount : Int
+hangulSCount =
+    hangulLCount * hangulNCount
+
+
+isHangulSyllable : Int -> Bool
+isHangulSyllable code =
+    let
+        index =
+            code - hangulSBase
+    in
+    index >= 0 && index < hangulSCount
+
+
+decomposeHangulSyllable : Int -> List Int
+decomposeHangulSyllable code =
+    let
+        index =
+            code - hangulSBase
+
+        leading =
+            hangulLBase + (index // hangulNCount)
+
+        vowel =
+            hangulVBase + (modBy hangulNCount index // hangulTCount)
+
+        trailing =
+            modBy hangulTCount index
+    in
+    if trailing == 0 then
+        [ leading, vowel ]
+
+    else
+        [ leading, vowel, trailing ]
