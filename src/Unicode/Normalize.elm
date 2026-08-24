@@ -101,6 +101,7 @@ fromCodePoints codes =
 canonicalDecompose : List Int -> List Int
 canonicalDecompose =
     let
+        decompose : Int -> List Int
         decompose code =
             Nothing
                 |> tryMaybe (\() -> decomposeHangulSyllable code)
@@ -113,6 +114,7 @@ canonicalDecompose =
 compatibleDecompose : List Int -> List Int
 compatibleDecompose =
     let
+        decompose : Int -> List Int
         decompose code =
             Nothing
                 |> tryMaybe (\() -> decomposeHangulSyllable code)
