@@ -102,52 +102,8 @@ def recursive_compatible_decompose(code):
 ##
 
 
-ELM_MODULE_TEMPLATE = """
-module Unicode.Normalize.Internal exposing
-    ( canonicalDecomposition
-    , compatibleDecomposition
-    , combiningClass
-    , canonicalComposition
-    )
-
-canonicalDecomposition : Int -> Maybe (List Int)
-canonicalDecomposition code =
-    case code of
-{%- for code in canonical_mappings %}
-        {{ code }} -> Just [ {{ canonical_mappings[code] | join(', ') }} ]
-{%- endfor %}
-        _ -> Nothing
-
-compatibleDecomposition : Int -> Maybe (List Int)
-compatibleDecomposition code =
-    case code of
-{%- for code in compatible_mappings %}
-        {{ code }} -> Just [ {{ compatible_mappings[code] | join(', ') }} ]
-{%- endfor %}
-        _ -> Nothing
-
-combiningClass : Int -> Int
-combiningClass code =
-    case code of
-{%- for code in combining_classes %}
-        {{ code }} -> {{ combining_classes[code] }}
-{%- endfor %}
-        _ -> 0
-
-canonicalComposition : Int -> Int -> Maybe Int
-canonicalComposition code1 code2 =
-    case code1 of
-{%- for code1 in canonical_compositions %}
-        {{ code1 }} -> case code2 of
-{%- for code2 in canonical_compositions[code1] %}
-            {{ code2 }} -> Just {{ canonical_compositions[code1][code2] }}
-{%- endfor %}
-            _ -> Nothing
-{%- endfor %}
-        _ -> Nothing
-"""
-
-template = Template(ELM_MODULE_TEMPLATE)
+with open("templates/Internal.elm.j2", "r") as f:
+    template = Template(f.read())
 content = template.render(
     canonical_mappings={
         c: recursive_canonical_decompose(c) for c in canonical_mappings

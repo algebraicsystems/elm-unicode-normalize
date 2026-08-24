@@ -42,8 +42,8 @@ node_modules:
 	poetry install --with=dev
 
 
-src/Unicode/Normalize/Internal.elm: generate.py UnicodeData.txt CompositionExclusions.txt | src/Unicode/Normalize .venv
+src/Unicode/Normalize/Internal.elm: generate.py templates/Internal.elm.j2 UnicodeData.txt CompositionExclusions.txt | src/Unicode/Normalize .venv
 	poetry run python generate.py
 
-tests/TestNormalize.elm: generate-tests.py NormalizationTest.txt | tests .venv
+tests/TestNormalize.elm: generate-tests.py templates/TestNormalize.elm.j2 NormalizationTest.txt | tests .venv
 	poetry run python generate-tests.py

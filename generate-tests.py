@@ -50,41 +50,9 @@ def format_elm_string(codepoints):
     return '"' + "".join(f"\\u{{{code:05X}}}" for code in codepoints) + '"'
 
 
-ELM_MODULE_TEMPLATE = """
-module TestNormalize exposing (suite)
+with open("templates/TestNormalize.elm.j2", "r") as f:
+    template = Template(f.read())
 
-import Test exposing (Test)
-import Expect
-
-import Unicode.Normalize exposing (Form(..), normalize)
-
-suite : Test
-suite =
-    Test.describe "Unicode.Normalize"
-        [
-{% for case in cases %}
-            Test.test "Normalizes case {{ loop.index }} to NFC" <|
-                \\() -> Expect.equal
-                    (normalize NFC {{ format_elm_string(case.source) }})
-                    {{ format_elm_string(case.nfc) }},
-            Test.test "Normalizes case {{ loop.index }} to NFD" <|
-                \\() -> Expect.equal
-                    (normalize NFD {{ format_elm_string(case.source) }})
-                    {{ format_elm_string(case.nfd) }},
-            Test.test "Normalizes case {{ loop.index }} to NFKC" <|
-                \\() -> Expect.equal
-                    (normalize NFKC {{ format_elm_string(case.source) }})
-                    {{ format_elm_string(case.nfkc) }},
-            Test.test "Normalizes case {{ loop.index }} to NFKD" <|
-                \\() -> Expect.equal
-                    (normalize NFKD {{ format_elm_string(case.source) }})
-                    {{ format_elm_string(case.nfkd) }}
-{%- if not loop.last %},{% endif %}
-{% endfor %}
-        ]
-"""
-
-template = Template(ELM_MODULE_TEMPLATE)
 content = template.render(cases=cases, format_elm_string=format_elm_string)
 
 with open("tests/TestNormalize.elm", "w") as f:
