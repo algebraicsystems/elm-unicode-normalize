@@ -5,8 +5,17 @@ BASE_URL := https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 .PHONY: all
 all: src/Unicode/Normalize/Internal.elm
 
+.PHONY: format
+format: | node_modules .venv
+	poetry run black --target-version=py312 generate.py generate-tests.py
+	pnpm run format
+
+.PHONY: review
+review: | node_modules
+	pnpm run review
+
 .PHONY: test
-test: tests/TestNormalize.elm
+test: tests/TestNormalize.elm | node_modules
 	pnpm run test
 
 
@@ -26,8 +35,11 @@ src/Unicode/Normalize:
 tests:
 	mkdir tests
 
+node_modules:
+	pnpm install
+
 .venv:
-	poetry install
+	poetry install --with=dev
 
 
 src/Unicode/Normalize/Internal.elm: generate.py UnicodeData.txt CompositionExclusions.txt | src/Unicode/Normalize .venv
