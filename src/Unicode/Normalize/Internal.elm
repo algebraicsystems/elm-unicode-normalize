@@ -1,4 +1,3 @@
-
 module Unicode.Normalize.Internal exposing
     ( canonicalDecomposition
     , compatibleDecomposition

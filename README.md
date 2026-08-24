@@ -14,10 +14,10 @@ The test suite is generated from [the suite provided by Unicode](https://www.uni
 
 ## Planned performance improvements
 
-The current version (1.0.0) is a very naive implementation focusing entirely on correctness over performance. The code operates directly on a list of code points (`List Int` internally). However, it is definitely possible to do better, even in pure Elm! Here are some planned improvements:
+The current version (1.0.1) is a very naive implementation focusing entirely on correctness over performance. The code operates directly on a list of code points (`List Int` internally). However, it is definitely possible to do better, even in pure Elm! Here are some planned improvements:
 
 1. Don't break down the string into code points if it is already normalized.
 2. Process sections that need to be normalized in small chunks instead of processing the whole string all at once.
 3. Use a more efficient intermediate representation like an `Array Int`.
 
-These improvements will be implemented in versions 1.0.1 and beyond.
+These improvements will be implemented in versions 1.0.2 and beyond.

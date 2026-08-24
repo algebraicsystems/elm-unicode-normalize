@@ -3,12 +3,17 @@ module Unicode.Normalize exposing
     , normalize
     )
 
-{-| Get a Unicode Normalization Form of a string.
+{-| Unicode normalization.
 
 There are multiple ways to normalize a string, referred to as _Normalization
 Forms_. Which one you want depends on what you want to do with the string, but
 the most common is `NFC`, which preserves the exact visual appearance of the
-string. If you don't care about the details, just use the `normalize` function.
+string. If you don't care about the details, just use `normalize NFC`.
+
+    import Unicode.Normalize exposing (Form(..), normalize)
+
+    normalize NFC "é"
+    --> "é"
 
 
 # Normalization Forms
@@ -43,12 +48,34 @@ import Unicode.Normalize.Internal
   - **NFKD**: Compatibility decomposition without recomposition.
 
 _Canonical decomposition_ splits single characters into sequences of equivalent
-combining characters. _Compatibilty decomposition_ extends canonical
+combining characters. _Compatibility decomposition_ extends canonical
 decomposition by also replacing variants of the same logical character (such as
 replacing ¼ with 1/4).
 
 _Canonical composition_ undoes the process of canonical decomposition,
 combining sequences into single characters wherever possible.
+
+For example, the character "ñ" can be represented as a single code point
+(`U+00F1`) or as two code points ("n" followed by a combining tilde,
+`U+006E U+0303`). The normalization forms handle this differently:
+
+    -- NFC composes into a single character
+    normalize NFC "ñ"  -- (n + combining tilde)
+    --> "ñ"            -- (single ñ)
+
+    -- NFD decomposes into base + combining character
+    normalize NFD "ñ"  -- (single ñ)
+    --> "ñ"            -- (n + combining tilde)
+
+The compatibility forms also replace visual variants:
+
+    -- NFKC replaces ﬁ ligature with "fi" and composes
+    normalize NFKC "ﬁ"
+    --> "fi"
+
+    -- NFKD replaces ﬁ ligature with "fi" and decomposes
+    normalize NFKD "ﬁ"
+    --> "fi"
 
 -}
 type Form
@@ -58,7 +85,23 @@ type Form
     | NFKD
 
 
-{-| Normalize a string using a particular Normalization Form.
+{-| Normalize a string to a particular Normalization Form.
+
+    -- Two equivalent representations of "é" become identical after NFC
+    normalize NFC "é" == normalize NFC "é"
+    --> True
+
+    -- ASCII strings are unaffected
+    normalize NFC "hello"
+    --> "hello"
+
+    -- Compatibility normalization replaces special forms
+    normalize NFKC "①②③"
+    --> "①②③"
+
+    normalize NFKC "ﬃ"
+    --> "ffi"
+
 -}
 normalize : Form -> String -> String
 normalize form =
