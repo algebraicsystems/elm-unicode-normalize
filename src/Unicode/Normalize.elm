@@ -120,11 +120,11 @@ canonicalCompose codes =
             []
 
         code :: rest ->
-            canonicalComposeHelper code [] rest
+            canonicalComposeWithBlockers code [] rest
 
 
-canonicalComposeHelper : Int -> List Int -> List Int -> List Int
-canonicalComposeHelper starter blockers codes =
+canonicalComposeWithBlockers : Int -> List Int -> List Int -> List Int
+canonicalComposeWithBlockers starter blockers codes =
     case codes of
         [] ->
             starter :: List.reverse blockers
@@ -143,13 +143,13 @@ canonicalComposeHelper starter blockers codes =
             in
             case ( canCompose, canonicalComposition starter code ) of
                 ( True, Just composed ) ->
-                    canonicalComposeHelper composed blockers rest
+                    canonicalComposeWithBlockers composed blockers rest
 
                 _ ->
                     if currentClass == 0 then
                         starter
                             :: List.reverse blockers
-                            ++ canonicalComposeHelper code [] rest
+                            ++ canonicalComposeWithBlockers code [] rest
 
                     else
-                        canonicalComposeHelper starter (code :: blockers) rest
+                        canonicalComposeWithBlockers starter (code :: blockers) rest
