@@ -11,6 +11,9 @@ importers:
       elm:
         specifier: 0.19.2-0
         version: 0.19.2-0
+      elm-format:
+        specifier: ^0.8.8
+        version: 0.8.8
       elm-review:
         specifier: ^2.13.5
         version: 2.13.5(supports-color@7.2.0)
@@ -19,6 +22,31 @@ importers:
         version: 0.19.2-0
 
 packages:
+
+  '@avh4/elm-format-darwin-arm64@0.8.8-1':
+    resolution: {integrity: sha512-VDu3CRajhB/Sax+CEU4PhIzErBZv8vVxbk9Sk8seUHa1ngfICa3Ejoq3PhnoOFKYF1v1sSxNOC2RnUzvd/9bUw==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@avh4/elm-format-darwin-x64@0.8.8-1':
+    resolution: {integrity: sha512-9NAzi3HUBSHEIx3Nje+a6wFcv6RDKv2PO0OUNcV/XlS4Sou3r89xsYAVAXS8mi4+CKTdscyfSSkgGd8qiCCxAw==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@avh4/elm-format-linux-arm64@0.8.8-1':
+    resolution: {integrity: sha512-VNuXYphgxtnk7Gw+VBgWBeA9k8wKSo9r/O2F7udgurokYLO8S+RGhLHgD9mb6Yecv/veWz4v9n/O0IggH/BOCQ==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@avh4/elm-format-linux-x64@0.8.8-1':
+    resolution: {integrity: sha512-IvtmUTDw/V5mBeglLgtQMzWZPc0QvmqUmoJ+vipxYii3DJ/1KV2drtpvlLuFdBlFrehUivtrh4HhOTsdGXxyXQ==}
+    cpu: [x64]
+    os: [linux]
+
+  '@avh4/elm-format-win32-x64@0.8.8-1':
+    resolution: {integrity: sha512-qGYZM2oJFSVQ80Tayk1v15ba7PWCU3B89EkA3Fy4YQasvtA+UrYYR5Bv7MRF4kn6Zp7oSDk4FhknURFsZWZ7kg==}
+    cpu: [x64]
+    os: [win32]
 
   '@elm_binaries/darwin_arm64@0.19.2-0':
     resolution: {integrity: sha512-vhgvWAgc+jkB/oSCqI0BK1w908ivNbV6OBWIGtJgbzAXFh6RYLcGdE04+X6CTLgj+u5ufl81lsnMG6lWEMzbJg==}
@@ -175,6 +203,10 @@ packages:
   defer-to-connect@2.0.1:
     resolution: {integrity: sha512-4tvttepXG1VaYGrRibk5EwJd1t4udunSOVMdLSAL6mId1ix438oPwPZMALY41FCijukO1L0twNcGsdzS7dHgDg==}
     engines: {node: '>=10'}
+
+  elm-format@0.8.8:
+    resolution: {integrity: sha512-OJYUtVnepuy8UZdnL5OCjSxUY5+dIGP2NdWTB6icxVVOOH0b8MpJIijTPsGW+ztnv9yzSoTK0dhCuVDh+AGhNQ==}
+    hasBin: true
 
   elm-review@2.13.5:
     resolution: {integrity: sha512-Iw3YztGjmuGyn4nIEVOxqx+dacJialprpB0ZVrBHA0sBBOQ9+QhBaQnQ0tp0G8U8UoIAush0M7XoBqzUN1F/+A==}
@@ -502,6 +534,21 @@ packages:
 
 snapshots:
 
+  '@avh4/elm-format-darwin-arm64@0.8.8-1':
+    optional: true
+
+  '@avh4/elm-format-darwin-x64@0.8.8-1':
+    optional: true
+
+  '@avh4/elm-format-linux-arm64@0.8.8-1':
+    optional: true
+
+  '@avh4/elm-format-linux-x64@0.8.8-1':
+    optional: true
+
+  '@avh4/elm-format-win32-x64@0.8.8-1':
+    optional: true
+
   '@elm_binaries/darwin_arm64@0.19.2-0':
     optional: true
 
@@ -657,6 +704,14 @@ snapshots:
       clone: 1.0.4
 
   defer-to-connect@2.0.1: {}
+
+  elm-format@0.8.8:
+    optionalDependencies:
+      '@avh4/elm-format-darwin-arm64': 0.8.8-1
+      '@avh4/elm-format-darwin-x64': 0.8.8-1
+      '@avh4/elm-format-linux-arm64': 0.8.8-1
+      '@avh4/elm-format-linux-x64': 0.8.8-1
+      '@avh4/elm-format-win32-x64': 0.8.8-1
 
   elm-review@2.13.5(supports-color@7.2.0):
     dependencies:
