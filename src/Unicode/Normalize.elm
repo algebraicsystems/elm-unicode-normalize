@@ -1,6 +1,6 @@
 module Unicode.Normalize exposing
-    ( normalize
-    , Form(..), normalizeForm
+    ( Form(..)
+    , normalize
     )
 
 {-| Get a Unicode Normalization Form of a string.
@@ -11,14 +11,14 @@ the most common is `NFC`, which preserves the exact visual appearance of the
 string. If you don't care about the details, just use the `normalize` function.
 
 
-# Default
-
-@docs normalize
-
-
 # Normalization Forms
 
-@docs Form, normalizeForm
+@docs Form
+
+
+# Normalize a String
+
+@docs normalize
 
 -}
 
@@ -35,19 +35,20 @@ import Unicode.Normalize.Internal
 -- PUBLIC API
 
 
-{-| Get the NFC normalization of a string.
--}
-normalize : String -> String
-normalize =
-    normalizeForm NFC
-
-
 {-| The different ways to normalize a string.
 
   - **NFC**: Canonical decomposition followed by canonical composition.
   - **NFD**: Canonical decomposition without recomposition.
   - **NFKC**: Compatibility decomposition followed by canonical composition.
   - **NFKD**: Compatibility decomposition without recomposition.
+
+_Canonical decomposition_ splits single characters into sequences of equivalent
+combining characters. _Compatibilty decomposition_ extends canonical
+decomposition by also replacing variants of the same logical character (such as
+replacing ¼ with 1/4).
+
+_Canonical composition_ undoes the process of canonical decomposition,
+combining sequences into single characters wherever possible.
 
 -}
 type Form
@@ -59,29 +60,34 @@ type Form
 
 {-| Normalize a string using a particular Normalization Form.
 -}
-normalizeForm : Form -> String -> String
-normalizeForm form =
+normalize : Form -> String -> String
+normalize form =
     case form of
         NFC ->
-            withCodePoints
-                (canonicalDecompose >> canonicalOrder >> canonicalCompose)
+            toCodePoints
+                >> canonicalDecompose
+                >> canonicalOrder
+                >> canonicalCompose
+                >> fromCodePoints
 
         NFD ->
-            withCodePoints
-                (canonicalDecompose >> canonicalOrder)
+            toCodePoints
+                >> canonicalDecompose
+                >> canonicalOrder
+                >> fromCodePoints
 
         NFKC ->
-            withCodePoints
-                (compatibleDecompose >> canonicalOrder >> canonicalCompose)
+            toCodePoints
+                >> compatibleDecompose
+                >> canonicalOrder
+                >> canonicalCompose
+                >> fromCodePoints
 
         NFKD ->
-            withCodePoints
-                (compatibleDecompose >> canonicalOrder)
-
-
-withCodePoints : (List Int -> List Int) -> String -> String
-withCodePoints f =
-    toCodePoints >> f >> fromCodePoints
+            toCodePoints
+                >> compatibleDecompose
+                >> canonicalOrder
+                >> fromCodePoints
 
 
 toCodePoints : String -> List Int
@@ -192,27 +198,11 @@ canonicalComposeWithBlockers starter blockers codes =
 
 
 canonicalOrHangulComposition : Int -> Int -> Maybe Int
-canonicalOrHangulComposition =
-    tryCompositions
-        [ composeHangulSyllable1
-        , composeHangulSyllable2
-        , canonicalComposition
-        ]
-
-
-tryCompositions : List (Int -> Int -> Maybe Int) -> Int -> Int -> Maybe Int
-tryCompositions compositions starter code =
-    case compositions of
-        composition :: rest ->
-            case composition starter code of
-                Just composed ->
-                    Just composed
-
-                Nothing ->
-                    tryCompositions rest starter code
-
-        [] ->
-            Nothing
+canonicalOrHangulComposition starter code =
+    Nothing
+        |> tryMaybe (\() -> composeHangulSyllable1 starter code)
+        |> tryMaybe (\() -> composeHangulSyllable2 starter code)
+        |> tryMaybe (\() -> canonicalComposition starter code)
 
 
 

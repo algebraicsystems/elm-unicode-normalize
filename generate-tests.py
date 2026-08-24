@@ -56,7 +56,7 @@ module TestNormalize exposing (suite)
 import Test exposing (Test)
 import Expect
 
-import Unicode.Normalize exposing (normalizeForm, Form(..))
+import Unicode.Normalize exposing (Form(..), normalize)
 
 suite : Test
 suite =
@@ -65,19 +65,19 @@ suite =
 {% for case in cases %}
             Test.test "Normalizes case {{ loop.index }} to NFC" <|
                 \\() -> Expect.equal
-                    (normalizeForm NFC {{ format_elm_string(case.source) }})
+                    (normalize NFC {{ format_elm_string(case.source) }})
                     {{ format_elm_string(case.nfc) }},
             Test.test "Normalizes case {{ loop.index }} to NFD" <|
                 \\() -> Expect.equal
-                    (normalizeForm NFD {{ format_elm_string(case.source) }})
+                    (normalize NFD {{ format_elm_string(case.source) }})
                     {{ format_elm_string(case.nfd) }},
             Test.test "Normalizes case {{ loop.index }} to NFKC" <|
                 \\() -> Expect.equal
-                    (normalizeForm NFKC {{ format_elm_string(case.source) }})
+                    (normalize NFKC {{ format_elm_string(case.source) }})
                     {{ format_elm_string(case.nfkc) }},
             Test.test "Normalizes case {{ loop.index }} to NFKD" <|
                 \\() -> Expect.equal
-                    (normalizeForm NFKD {{ format_elm_string(case.source) }})
+                    (normalize NFKD {{ format_elm_string(case.source) }})
                     {{ format_elm_string(case.nfkd) }}
 {%- if not loop.last %},{% endif %}
 {% endfor %}
