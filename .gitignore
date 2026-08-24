@@ -4,7 +4,6 @@
 /NormalizationTest.txt
 
 # Generated code
-/src/Unicode/Normalize/Internal.elm
 /tests/TestNormalize.elm
 
 # Node
