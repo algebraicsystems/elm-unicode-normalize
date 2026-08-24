@@ -45,6 +45,16 @@ with open("CompositionExclusions.txt", "r") as f:
             composition_exclusions.add(int(content, 16))
 
 ##
+## ADD DERIVED COMPOSITION EXCLUSIONS
+##
+
+for code, decomposed in canonical_mappings.items():
+    if len(decomposed) >= 2 and (
+        code in combining_classes or decomposed[0] in combining_classes
+    ):
+        composition_exclusions.add(code)
+
+##
 ## BUILD CANONICAL COMPOSITIONS
 ##
 

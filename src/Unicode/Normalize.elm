@@ -1,7 +1,6 @@
 module Unicode.Normalize exposing
     ( normalize
     , Form(..), normalizeForm
-    , composeHangulSyllable1, composeHangulSyllable2
     )
 
 {-| Get a Unicode Normalization Form of a string.
@@ -329,9 +328,6 @@ composeHangulSyllable2 syllable trailing =
         trailingIndex : Int
         trailingIndex =
             trailing - trailingBase
-
-        _ =
-            Debug.log "indices" ( syllableIndex, trailingIndex )
     in
     if
         (syllableIndex >= 0)
