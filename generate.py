@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from itertools import groupby
 from jinja2 import Template
 
 ##
@@ -8,8 +9,9 @@ from jinja2 import Template
 
 canonical_mappings = {}
 compatible_mappings = {}
-combining_classes = {}
+combining_classes = defaultdict(set)
 canonical_compositions = defaultdict(dict)
+non_starters = set()
 
 
 with open("UnicodeData.txt", "r") as f:
@@ -21,7 +23,8 @@ with open("UnicodeData.txt", "r") as f:
         mapping = fields[5]
 
         if ccc != 0:
-            combining_classes[code] = ccc
+            combining_classes[ccc].add(code)
+            non_starters.add(code)
 
         if mapping:
             if match := re.fullmatch(r"<[a-zA-Z]*>(.*)", mapping):
@@ -50,7 +53,7 @@ with open("CompositionExclusions.txt", "r") as f:
 
 for code, decomposed in canonical_mappings.items():
     if len(decomposed) >= 2 and (
-        code in combining_classes or decomposed[0] in combining_classes
+        code in non_starters or decomposed[0] in non_starters
     ):
         composition_exclusions.add(code)
 
@@ -98,6 +101,20 @@ def recursive_compatible_decompose(code):
 
 
 ##
+## BUILD COMBINING CLASS RANGES
+##
+
+combining_class_ranges = {}
+
+for ccc in combining_classes:
+    ranges = []
+    for _, group in groupby(enumerate(sorted(combining_classes[ccc])), lambda pair: pair[1] - pair[0]):
+        group_list = [val for _, val in group]
+        ranges.append((group_list[0], group_list[-1]))
+    combining_class_ranges[ccc] = ranges
+
+
+##
 ## RENDER ELM MODULE
 ##
 
@@ -120,7 +137,7 @@ for c in canonical_mappings:
 content = template.render(
     canonical_mappings=full_canonical_mappings,
     compatible_mappings=full_compatible_mappings,
-    combining_classes=combining_classes,
+    combining_class_ranges=combining_class_ranges,
     canonical_compositions=canonical_compositions,
 )
 

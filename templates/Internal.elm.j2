@@ -23,11 +23,26 @@ compatibleDecomposition code =
 
 combiningClass : Int -> Int
 combiningClass code =
-    case code of
-{%- for code in combining_classes %}
-        {{ code }} -> {{ combining_classes[code] }}
+{%- for code in combining_class_ranges %}
+    if
+{%- for range_begin, range_end in combining_class_ranges[code] %}
+{%- if range_begin == range_end %}
+        (code == {{ range_begin }})
+{%- else %}
+        (code >= {{ range_begin }} && code <= {{ range_end }})
+{%- endif %}
+{%- if not loop.last %}
+        ||
+{%- endif %}
 {%- endfor %}
-        _ -> 0
+    then
+        {{ code }}
+{%- if not loop.last %}
+    else
+{%- endif %}
+{%- endfor %}
+    else
+        0
 
 canonicalComposition : Int -> Int -> Maybe Int
 canonicalComposition code1 code2 =
