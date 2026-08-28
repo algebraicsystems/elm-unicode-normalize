@@ -40,7 +40,6 @@ with open("UnicodeData.txt", "r") as f:
 
 composition_exclusions = set()
 
-
 with open("CompositionExclusions.txt", "r") as f:
     for line in f:
         content = line.split("#", 1)[0].strip()
@@ -52,9 +51,7 @@ with open("CompositionExclusions.txt", "r") as f:
 ##
 
 for code, decomposed in canonical_mappings.items():
-    if len(decomposed) >= 2 and (
-        code in non_starters or decomposed[0] in non_starters
-    ):
+    if len(decomposed) >= 2 and (code in non_starters or decomposed[0] in non_starters):
         composition_exclusions.add(code)
 
 ##
@@ -104,14 +101,22 @@ def recursive_compatible_decompose(code):
 ## BUILD COMBINING CLASS RANGES
 ##
 
+combining_class_singles = {}
 combining_class_ranges = {}
 
 for ccc in combining_classes:
     ranges = []
-    for _, group in groupby(enumerate(sorted(combining_classes[ccc])), lambda pair: pair[1] - pair[0]):
+    for _, group in groupby(
+        enumerate(sorted(combining_classes[ccc])), lambda pair: pair[1] - pair[0]
+    ):
         group_list = [val for _, val in group]
-        ranges.append((group_list[0], group_list[-1]))
-    combining_class_ranges[ccc] = ranges
+        if group_list[0] != group_list[-1]:
+            ranges.append((group_list[0], group_list[-1]))
+        else:
+            combining_class_singles[group_list[0]] = ccc
+
+    if ranges:
+        combining_class_ranges[ccc] = ranges
 
 
 ##
@@ -127,7 +132,8 @@ full_canonical_mappings = {
 }
 
 full_compatible_mappings = {
-    c: recursive_compatible_decompose(c) for c in canonical_mappings | compatible_mappings
+    c: recursive_compatible_decompose(c)
+    for c in canonical_mappings | compatible_mappings
 }
 
 for c in canonical_mappings:
@@ -137,6 +143,7 @@ for c in canonical_mappings:
 content = template.render(
     canonical_mappings=full_canonical_mappings,
     compatible_mappings=full_compatible_mappings,
+    combining_class_singles=combining_class_singles,
     combining_class_ranges=combining_class_ranges,
     canonical_compositions=canonical_compositions,
 )
