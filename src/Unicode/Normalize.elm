@@ -171,6 +171,7 @@ compatibleDecompose =
             Nothing
                 |> tryMaybe (\() -> decomposeHangulSyllable code)
                 |> tryMaybe (\() -> compatibleDecomposition code)
+                |> tryMaybe (\() -> canonicalDecomposition code)
                 |> Maybe.withDefault [ code ]
     in
     List.concatMap decompose

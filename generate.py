@@ -104,14 +104,22 @@ def recursive_compatible_decompose(code):
 
 with open("templates/Internal.elm.j2", "r") as f:
     template = Template(f.read())
+
+full_canonical_mappings = {
+    c: recursive_canonical_decompose(c) for c in canonical_mappings
+}
+
+full_compatible_mappings = {
+    c: recursive_compatible_decompose(c) for c in canonical_mappings | compatible_mappings
+}
+
+for c in canonical_mappings:
+    if full_compatible_mappings.get(c) == full_canonical_mappings[c]:
+        del full_compatible_mappings[c]
+
 content = template.render(
-    canonical_mappings={
-        c: recursive_canonical_decompose(c) for c in canonical_mappings
-    },
-    compatible_mappings={
-        c: recursive_compatible_decompose(c)
-        for c in canonical_mappings | compatible_mappings
-    },
+    canonical_mappings=full_canonical_mappings,
+    compatible_mappings=full_compatible_mappings,
     combining_classes=combining_classes,
     canonical_compositions=canonical_compositions,
 )
