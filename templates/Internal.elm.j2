@@ -24,10 +24,24 @@ compatibleDecomposition code =
 combiningClass : Int -> Int
 combiningClass code =
     case code of
-{%- for code in combining_classes %}
-        {{ code }} -> {{ combining_classes[code] }}
+{%- for code in combining_class_singles %}
+        {{ code }} -> {{ combining_class_singles[code] }}
 {%- endfor %}
-        _ -> 0
+        _ ->
+{%- for code in combining_class_ranges %}
+            if
+{%- for range_begin, range_end in combining_class_ranges[code] %}
+{%- if loop.first %}
+                (code >= {{ range_begin }} && code <= {{ range_end }})
+{%- else %}
+                || (code >= {{ range_begin }} && code <= {{ range_end }})
+{%- endif %}
+{%- endfor %}
+            then
+                {{ code }}
+            else
+{%- endfor %}
+            0
 
 canonicalComposition : Int -> Int -> Maybe Int
 canonicalComposition code1 code2 =
