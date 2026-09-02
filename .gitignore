@@ -10,5 +10,10 @@
 /node_modules/
 
 # Elm
+/benchmarks/elm-stuff/
 /elm-stuff/
 /docs.json
+
+# Parcel
+/dist/
+/.parcel-cache/
