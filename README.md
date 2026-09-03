@@ -20,4 +20,4 @@ The current version of this package is a very naive implementation focusing enti
 2. Process sections that need to be normalized in small chunks instead of processing the whole string all at once.
 3. Use a more efficient intermediate representation like an `Array Int`.
 
-These improvements will be implemented in version 1.0.3 and beyond.
+These improvements will be implemented in version 1.0.5 and beyond. Version 1.0.4 will be mostly focused on reducing the generated code size as much as possible.
