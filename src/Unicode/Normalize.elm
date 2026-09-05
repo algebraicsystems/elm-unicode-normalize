@@ -157,7 +157,7 @@ canonicalDecompose =
         decompose code =
             Nothing
                 |> tryMaybe (\() -> decomposeHangulSyllable code)
-                |> tryMaybe (\() -> canonicalDecomposition code)
+                |> tryMaybe (\() -> Maybe.map (String.toList >> List.map Char.toCode) (canonicalDecomposition (Char.fromCode code)))
                 |> Maybe.withDefault [ code ]
     in
     List.concatMap decompose
@@ -170,8 +170,8 @@ compatibleDecompose =
         decompose code =
             Nothing
                 |> tryMaybe (\() -> decomposeHangulSyllable code)
-                |> tryMaybe (\() -> compatibleDecomposition code)
-                |> tryMaybe (\() -> canonicalDecomposition code)
+                |> tryMaybe (\() -> Maybe.map (String.toList >> List.map Char.toCode) (compatibleDecomposition (Char.fromCode code)))
+                |> tryMaybe (\() -> Maybe.map (String.toList >> List.map Char.toCode) (canonicalDecomposition (Char.fromCode code)))
                 |> Maybe.withDefault [ code ]
     in
     List.concatMap decompose
@@ -249,7 +249,7 @@ canonicalOrHangulComposition starter code =
     Nothing
         |> tryMaybe (\() -> composeHangulSyllable1 starter code)
         |> tryMaybe (\() -> composeHangulSyllable2 starter code)
-        |> tryMaybe (\() -> canonicalComposition starter code)
+        |> tryMaybe (\() -> Maybe.map Char.toCode (canonicalComposition (Char.fromCode starter) (Char.fromCode code)))
 
 
 

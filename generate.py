@@ -1,7 +1,7 @@
+import jinja2
 import re
 from collections import defaultdict
 from itertools import groupby
-from jinja2 import Template
 
 ##
 ## PARSE UNICODE DATA
@@ -123,9 +123,17 @@ for ccc in combining_classes:
 ## RENDER ELM MODULE
 ##
 
+def elm_unicode_char(value):
+    return f"'\\u{{{value:04X}}}'"
 
-with open("templates/Internal.elm.j2", "r") as f:
-    template = Template(f.read())
+def elm_unicode_string(values):
+    return "\"" + "".join(f"\\u{{{value:04X}}}" for value in values) + "\""
+
+env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
+env.filters['elm_unicode_char'] = elm_unicode_char
+env.filters['elm_unicode_string'] = elm_unicode_string
+
+template = env.get_template("Internal.elm.j2")
 
 full_canonical_mappings = {
     c: recursive_canonical_decompose(c) for c in canonical_mappings

@@ -5,19 +5,19 @@ module Unicode.Normalize.Internal exposing
     , canonicalComposition
     )
 
-canonicalDecomposition : Int -> Maybe (List Int)
+canonicalDecomposition : Char -> Maybe String
 canonicalDecomposition code =
     case code of
 {%- for code in canonical_mappings %}
-        {{ code }} -> Just [ {{ canonical_mappings[code] | join(', ') }} ]
+        {{ code | elm_unicode_char }} -> Just {{ canonical_mappings[code] | elm_unicode_string }}
 {%- endfor %}
         _ -> Nothing
 
-compatibleDecomposition : Int -> Maybe (List Int)
+compatibleDecomposition : Char -> Maybe String
 compatibleDecomposition code =
     case code of
 {%- for code in compatible_mappings %}
-        {{ code }} -> Just [ {{ compatible_mappings[code] | join(', ') }} ]
+        {{ code | elm_unicode_char }} -> Just {{ compatible_mappings[code] | elm_unicode_string }}
 {%- endfor %}
         _ -> Nothing
 
@@ -43,13 +43,13 @@ combiningClass code =
 {%- endfor %}
             0
 
-canonicalComposition : Int -> Int -> Maybe Int
+canonicalComposition : Char -> Char -> Maybe Char
 canonicalComposition code1 code2 =
     case code1 of
 {%- for code1 in canonical_compositions %}
-        {{ code1 }} -> case code2 of
+        {{ code1 | elm_unicode_char }} -> case code2 of
 {%- for code2 in canonical_compositions[code1] %}
-            {{ code2 }} -> Just {{ canonical_compositions[code1][code2] }}
+            {{ code2 | elm_unicode_char }} -> Just {{ canonical_compositions[code1][code2] | elm_unicode_char }}
 {%- endfor %}
             _ -> Nothing
 {%- endfor %}
