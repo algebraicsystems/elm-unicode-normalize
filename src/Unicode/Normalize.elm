@@ -18,10 +18,7 @@ string. If you don't care about the details, just use `normalizeNFC`.
     normalizeNFC (String.fromList [ 'ᄉ', 'ᅥ', 'ᆼ' ])
     --> "성"
 
-
-# Normalization Forms
-
-The different ways to normalize a string.
+The different ways to normalize a string are:
 
   - **NFC**: Canonical decomposition followed by canonical composition.
   - **NFD**: Canonical decomposition without recomposition.
@@ -57,6 +54,9 @@ The compatibility forms also replace visual variants:
     -- NFKD replaces ﬁ ligature with "fi" and decomposes
     normalize NFKD "ﬁñ"
     --> "fiñ"
+
+
+## Normalization Forms
 
 @docs normalizeNFC, normalizeNFD, normalizeNFKC, normalizeNFKD
 
