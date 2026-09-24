@@ -1,6 +1,6 @@
 module Unicode.Normalize exposing
-    ( Form(..)
-    , normalize
+    ( normalizeNFC, normalizeNFD, normalizeNFKC, normalizeNFKD
+    , Form(..), normalize
     )
 
 {-| Unicode normalization.
@@ -8,42 +8,20 @@ module Unicode.Normalize exposing
 There are multiple ways to normalize a string, referred to as _Normalization
 Forms_. Which one you want depends on what you want to do with the string, but
 the most common is `NFC`, which preserves the exact visual appearance of the
-string. If you don't care about the details, just use `normalize NFC`.
+string. If you don't care about the details, just use `normalizeNFC`.
 
     import Unicode.Normalize exposing (Form(..), normalize)
 
-    normalize NFC "é"
+    normalizeNFC "é"
     --> "é"
 
-    normalize NFC (String.fromList [ 'ᄉ', 'ᅥ', 'ᆼ' ])
+    normalizeNFC (String.fromList [ 'ᄉ', 'ᅥ', 'ᆼ' ])
     --> "성"
 
 
 # Normalization Forms
 
-@docs Form
-
-
-# Normalize a String
-
-@docs normalize
-
--}
-
-import Unicode.Normalize.Internal
-    exposing
-        ( canonicalComposition
-        , canonicalDecomposition
-        , combiningClass
-        , compatibleDecomposition
-        )
-
-
-
--- PUBLIC API
-
-
-{-| The different ways to normalize a string.
+The different ways to normalize a string.
 
   - **NFC**: Canonical decomposition followed by canonical composition.
   - **NFD**: Canonical decomposition without recomposition.
@@ -80,6 +58,75 @@ The compatibility forms also replace visual variants:
     normalize NFKD "ﬁñ"
     --> "fiñ"
 
+@docs normalizeNFC, normalizeNFD, normalizeNFKC, normalizeNFKD
+
+
+# JavaScript-style API
+
+This function mirrors the `String.prototype.normalize` function from
+JavaScript, which takes an argument specifying which normalization form to
+produce.
+
+@docs Form, normalize
+
+-}
+
+import Unicode.Normalize.Internal
+    exposing
+        ( canonicalComposition
+        , canonicalDecomposition
+        , combiningClass
+        , compatibleDecomposition
+        )
+
+
+
+-- SEPARATE FUNCTIONS
+
+
+{-| Get the NFC normalization of a string.
+-}
+normalizeNFC : String -> String
+normalizeNFC =
+    toCodePoints
+        >> canonicalDecompose
+        >> canonicalOrder
+        >> canonicalCompose
+        >> fromCodePoints
+
+
+{-| Get the NFD normalization of a string.
+-}
+normalizeNFD : String -> String
+normalizeNFD =
+    toCodePoints
+        >> canonicalDecompose
+        >> canonicalOrder
+        >> fromCodePoints
+
+
+{-| Get the NFKC normalization of a string.
+-}
+normalizeNFKC : String -> String
+normalizeNFKC =
+    toCodePoints
+        >> compatibleDecompose
+        >> canonicalOrder
+        >> canonicalCompose
+        >> fromCodePoints
+
+
+{-| Get the NFKD normalization of a string.
+-}
+normalizeNFKD : String -> String
+normalizeNFKD =
+    toCodePoints
+        >> compatibleDecompose
+        >> canonicalOrder
+        >> fromCodePoints
+
+
+{-| Choose a specific normalization form.
 -}
 type Form
     = NFC
@@ -110,30 +157,16 @@ normalize : Form -> String -> String
 normalize form =
     case form of
         NFC ->
-            toCodePoints
-                >> canonicalDecompose
-                >> canonicalOrder
-                >> canonicalCompose
-                >> fromCodePoints
+            normalizeNFC
 
         NFD ->
-            toCodePoints
-                >> canonicalDecompose
-                >> canonicalOrder
-                >> fromCodePoints
+            normalizeNFD
 
         NFKC ->
-            toCodePoints
-                >> compatibleDecompose
-                >> canonicalOrder
-                >> canonicalCompose
-                >> fromCodePoints
+            normalizeNFKC
 
         NFKD ->
-            toCodePoints
-                >> compatibleDecompose
-                >> canonicalOrder
-                >> fromCodePoints
+            normalizeNFKD
 
 
 toCodePoints : String -> List Int
